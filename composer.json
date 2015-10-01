@@ -1,0 +1,7 @@
+{
+    "require": {
+        "j7mbo/twitter-api-php": "dev-master",
+        "parse/php-sdk" : "1.1.*"
+    }
+}
+

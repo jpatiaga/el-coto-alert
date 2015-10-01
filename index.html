@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="refresh" content="60" >
+<title>El Coto</title>
+</head>
+<body>
+<h1>Alertas Cotopaxi</h1>
+<div id="alerts"></div>
+<audio id="audio">
+	<source src="/alarm.mp3" type="audio/mpeg" />
+</audio>
+</body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+	function readFromParse() {
+		$.ajax('https://api.parse.com/1/classes/AlertTweet', {
+			headers: {
+				'X-Parse-Application-Id': 'UfiwYXJ6Ud5p1HMjojrjDkXSLcQlMguchxq4ZO4Z',
+				'X-Parse-REST-API-Key': 'vqWoR2egc5WHuM1hGeXFSqLOBa5qMcGFCrmTPX1t'
+			}
+		}).done(function (data) {
+			console.log('d', data);
+		});
+	}
+
+
+	function soundAlert() {
+		$('#audio').get(0).play();
+	}
+	function writeData(data) {
+		for (var i = 0; i < data.length; i++) {
+			var container = $('<div></div>');
+			container.append($('<h4>@' + data[i].user.screen_name + '</h4>'));
+			container.append($('<em>' + parseTwitterDate(data[i].created_at) + '</em>'));
+			container.append($('<p>' + data[i].text + '</p>'));
+			container.append($('<a href="http://twitter.com/' + data[i].user.screen_name + '/status/' + data[i].id_str + '">Link to Tweet</a>'));
+			$('#alerts').append(container);
+		}
+		console.log(data);
+	}
+function parseTwitterDate(tdate) {
+    var system_date = new Date(Date.parse(tdate));
+    var user_date = new Date();
+    var diff = Math.floor((user_date - system_date) / 1000);
+    if (diff <= 1) {return "just now";}
+    if (diff < 20) {return diff + " seconds ago";}
+    if (diff < 40) {return "half a minute ago";}
+    if (diff < 60) {return "less than a minute ago";}
+    if (diff <= 90) {return "one minute ago";}
+    if (diff <= 3540) {return Math.round(diff / 60) + " minutes ago";}
+    if (diff <= 5400) {return "1 hour ago";}
+    if (diff <= 86400) {return Math.round(diff / 3600) + " hours ago";}
+    if (diff <= 129600) {return "1 day ago";}
+    if (diff < 604800) {return Math.round(diff / 86400) + " days ago";}
+    if (diff <= 777600) {return "1 week ago";}
+    return "on " + system_date;
+}
+	$.get("/salert.php", function(data) {
+		$('#alerts').html('');
+		if (data && data.length > 0) {
+			soundAlert();
+			writeData(data);
+		}
+	});
+
+	readFromParse();
+</script>
+</html>
